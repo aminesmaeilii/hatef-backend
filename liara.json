@@ -1,0 +1,8 @@
+{
+  "app": "hatef2",
+  "port": 8080,
+  "build": {
+    "location": "iran"
+  },
+  "disks": []
+}

@@ -1,0 +1,28 @@
+{
+  "name": "hatef-backend",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": "24.x",
+    "pnpm": "9.15.4"
+  },
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "build": "turbo run build",
+    "build:api": "turbo run build --filter @hatef/api...",
+    "build:worker": "turbo run build --filter @hatef/worker...",
+    "start:api": "node api/dist/main.js",
+    "start:worker": "node worker/dist/main.js",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "db:migrate": "pnpm --filter @hatef/database db:migrate",
+    "db:seed": "pnpm --filter @hatef/database db:seed",
+    "db:generate": "pnpm --filter @hatef/database db:generate",
+    "clean": "turbo run clean"
+  },
+  "devDependencies": {
+    "turbo": "2.10.6",
+    "typescript": "5.9.3",
+    "dotenv-cli": "11.0.0"
+  }
+}

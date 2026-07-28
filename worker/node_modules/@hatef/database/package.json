@@ -5,17 +5,17 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "dotenv -e ../../.env -- prisma generate && tsc -p tsconfig.json",
+    "build": "prisma generate && tsc -p tsconfig.json",
     "dev": "dotenv -e ../../.env -- prisma generate --watch",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint .",
     "test": "vitest run --passWithNoTests",
     "clean": "rimraf generated dist",
-    "db:generate": "dotenv -e ../../.env -- prisma generate",
-    "db:migrate": "dotenv -e ../../.env -- prisma migrate deploy",
-    "db:migrate:dev": "dotenv -e ../../.env -- prisma migrate dev",
-    "db:seed": "dotenv -e ../../.env -- tsx src/seed.ts",
-    "db:reset": "dotenv -e ../../.env -- prisma migrate reset --force"
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:seed": "tsx src/seed.ts",
+    "db:reset": "prisma migrate reset --force"
   },
   "dependencies": {
     "@hatef/auth": "workspace:^",
