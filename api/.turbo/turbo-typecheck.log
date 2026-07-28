@@ -1,4 +1,0 @@
-
-> @hatef/api@0.1.0 typecheck E:\github\hatef-new version\backend\api
-> tsc -p tsconfig.json --noEmit
-

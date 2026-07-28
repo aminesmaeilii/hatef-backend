@@ -1,4 +1,0 @@
-
-> @hatef/domain@0.1.0 typecheck E:\github\hatef-new version\backend\domain
-> tsc -p tsconfig.json --noEmit
-

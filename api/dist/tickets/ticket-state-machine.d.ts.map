@@ -1,1 +1,0 @@
-{"version":3,"file":"ticket-state-machine.d.ts","sourceRoot":"","sources":["../../src/tickets/ticket-state-machine.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,YAAY,EAAE,MAAM,eAAe,CAAC;AAC7C,OAAO,KAAK,EAAE,eAAe,EAAE,MAAM,kBAAkB,CAAC;AAExD;;;;;;;GAOG;AACH,eAAO,MAAM,kBAAkB,iHAQ7B,CAAC;AAEH,kIAAkI;AAClI,eAAO,MAAM,oBAAoB,EAAE,eAAe,EAAgE,CAAC"}
