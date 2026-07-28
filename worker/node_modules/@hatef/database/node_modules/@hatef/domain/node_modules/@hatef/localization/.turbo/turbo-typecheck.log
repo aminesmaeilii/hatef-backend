@@ -1,0 +1,4 @@
+
+> @hatef/localization@0.1.0 typecheck E:\github\hatef-new version\backend\localization
+> tsc -p tsconfig.json --noEmit
+

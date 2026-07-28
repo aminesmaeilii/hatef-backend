@@ -1,0 +1,141 @@
+
+> @hatef/api@0.1.0 test E:\github\hatef-new version\backend\api
+> vitest run
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90mE:/github/hatef-new version/backend/api[39m
+
+[90mstdout[2m | src/test/phase3.integration.test.ts
+[22m[39m◇ injected env (52) from ..\..\.env // tip: ⌘ override existing { override: true }
+
+[90mstdout[2m | src/test/phase5.integration.test.ts
+[22m[39m◇ injected env (52) from ..\..\.env // tip: ◈ secrets for agents [www.dotenvx.com]
+
+[90mstdout[2m | src/test/phase6.integration.test.ts
+[22m[39m◇ injected env (52) from ..\..\.env // tip: ◈ encrypted .env [www.dotenvx.com]
+
+[90mstdout[2m | src/test/phase2.integration.test.ts
+[22m[39m◇ injected env (52) from ..\..\.env // tip: ◈ encrypted .env [www.dotenvx.com]
+
+[90mstdout[2m | src/test/phase1.integration.test.ts
+[22m[39m◇ injected env (52) from ..\..\.env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+
+[90mstdout[2m | src/test/phase4.integration.test.ts
+[22m[39m◇ injected env (52) from ..\..\.env // tip: ⌁ auth for agents [www.vestauth.com]
+
+[90mstdout[2m | src/test/phase7.integration.test.ts
+[22m[39m◇ injected env (52) from ..\..\.env // tip: ◈ secrets for agents [www.dotenvx.com]
+
+[90mstdout[2m | src/test/phase1.integration.test.ts[2m > [22m[2mPhase 1: auth, RBAC/ABAC, and files (integration, real DB/Redis/MinIO)[2m > [22m[2missues a real DB-backed session via partner OTP and records an audit trail
+[22m[39m[dev-sms] template=otp-login to=+989022299803 params={"code":"630679"}
+
+[90mstdout[2m | src/test/phase7.integration.test.ts[2m > [22m[2mPhase 7: security hardening — step-up, file quarantine, file-count limit, rate limiting (integration, real DB)
+[22m[39m[dev-sms] template=otp-login to=+989549573834 params={"code":"731767"}
+
+[90mstdout[2m | src/test/phase2.integration.test.ts[2m > [22m[2mPhase 2: form engine immutability + evaluation workflow (integration, real DB)
+[22m[39m[dev-sms] template=otp-login to=+989519724347 params={"code":"945383"}
+
+[90mstdout[2m | src/test/phase4.integration.test.ts[2m > [22m[2mPhase 4: tasks, unified calendar/Gantt read-model, promotion scheduling and execution (integration, real DB)
+[22m[39m[dev-sms] template=otp-login to=+989146310230 params={"code":"629484"}
+
+[90mstdout[2m | src/test/phase6.integration.test.ts[2m > [22m[2mPhase 6: tickets, notifications, surveys, and reports (integration, real DB)
+[22m[39m[dev-sms] template=otp-login to=+989247640433 params={"code":"937832"}
+
+ [32m✓[39m src/test/phase1.integration.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 2957[2mms[22m[39m
+     [33m[2m✓[22m[39m issues a real DB-backed session via partner OTP and records an audit trail [33m 1014[2mms[22m[39m
+     [33m[2m✓[22m[39m enforces channel-scoped ABAC: denies a channel the user has no grant on, allows their own [33m 374[2mms[22m[39m
+     [33m[2m✓[22m[39m persists real uploaded file metadata and issues a working signed download URL [33m 562[2mms[22m[39m
+[31m[Nest] 1248  - [39m07/25/2026, 4:18:08 AM [31m  ERROR[39m [38;5;3m[HttpExceptionFilter] [39m[31mUnhandled exception on POST /api/v1/settlements/85050349-2e5c-4674-af32-5e9a50d4c6b2/decide[39m
+PrismaClientKnownRequestError: 
+Invalid `this.prisma.settlement.findUniqueOrThrow()` invocation in
+E:/github/hatef-new version/backend/api/src/settlements/settlements.service.ts:111:53
+
+  108 }
+  109 
+  110 async decideApproval(settlementId: string, input: DecideFinancialApproval, actor: RequestActor): Promise<Settlement> {
+→ 111   const settlement = await this.prisma.settlement.findUniqueOrThrow(
+An operation failed because it depends on one or more records that were required but not found. No record was found for a query.
+    at ei.handleRequestError (E:\github\hatef-new version\backend\database\generated\client\runtime\library.js:125:7268)
+    at ei.handleAndLogRequestError (E:\github\hatef-new version\backend\database\generated\client\runtime\library.js:125:6593)
+    at ei.request (E:\github\hatef-new version\backend\database\generated\client\runtime\library.js:125:6300)
+    at a (E:\github\hatef-new version\backend\database\generated\client\runtime\library.js:134:9551)
+    at SettlementsService.decideApproval (E:/github/hatef-new version/backend/api/src/settlements/settlements.service.ts:111:24)
+    at E:\github\hatef-new version\node_modules\.pnpm\@nestjs+core@11.1.28_@nestjs+common@11.1.28_reflect-metadata@0.2.2_rxjs@7.8.2__@nestjs+platfo_g4jarpxk7gcuohx5alng3oa4ye\node_modules\@nestjs\core\router\router-execution-context.js:47:62
+    at E:\github\hatef-new version\node_modules\.pnpm\@nestjs+core@11.1.28_@nestjs+common@11.1.28_reflect-metadata@0.2.2_rxjs@7.8.2__@nestjs+platfo_g4jarpxk7gcuohx5alng3oa4ye\node_modules\@nestjs\core\router\router-proxy.js:9:17
+[90mstdout[2m | src/test/phase3.integration.test.ts[2m > [22m[2mPhase 3: promotion types, pin pricing, quote negotiation, support-request workflow (integration, real DB)
+[22m[39m[dev-sms] template=otp-login to=+989751623555 params={"code":"893533"}
+
+[90mstdout[2m | src/test/phase5.integration.test.ts[2m > [22m[2mPhase 5: ledger, barter obligations, deliverables, and settlement (integration, real DB)
+[22m[39m[dev-sms] template=otp-login to=+989840072458 params={"code":"360106"}
+
+[90mstdout[2m | src/evaluation/evaluation-state-machine.test.ts
+[22m[39m◇ injected env (52) from ..\..\.env // tip: ◈ secrets for agents [www.dotenvx.com]
+
+ [32m✓[39m src/evaluation/evaluation-state-machine.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+[90mstdout[2m | src/rbac/permission.guard.test.ts
+[22m[39m◇ injected env (52) from ..\..\.env // tip: ⌘ suppress logs { quiet: true }
+
+ [32m✓[39m src/rbac/permission.guard.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+[90mstdout[2m | src/tasks/task-state-machine.test.ts
+[22m[39m◇ injected env (52) from ..\..\.env // tip: ⌘ override existing { override: true }
+
+ [32m✓[39m src/tasks/task-state-machine.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+[90mstdout[2m | src/barter/obligation-state-machine.test.ts
+[22m[39m◇ injected env (52) from ..\..\.env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
+
+ [32m✓[39m src/barter/obligation-state-machine.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+[90mstdout[2m | src/files/magic-byte.test.ts
+[22m[39m◇ injected env (52) from ..\..\.env // tip: ⌘ suppress logs { quiet: true }
+
+ [32m✓[39m src/files/magic-byte.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+[90mstdout[2m | src/promotions/support-request-state-machine.test.ts
+[22m[39m◇ injected env (52) from ..\..\.env // tip: ⌁ auth for agents [www.vestauth.com]
+
+ [32m✓[39m src/promotions/support-request-state-machine.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+[90mstdout[2m | src/tickets/ticket-state-machine.test.ts
+[22m[39m◇ injected env (52) from ..\..\.env // tip: ⌘ enable debugging { debug: true }
+
+ [32m✓[39m src/tickets/ticket-state-machine.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+[90mstdout[2m | src/health/health.controller.test.ts
+[22m[39m◇ injected env (52) from ..\..\.env // tip: ⌁ auth for agents [www.vestauth.com]
+
+ [32m✓[39m src/test/phase7.integration.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 8129[2mms[22m[39m
+     [33m[2m✓[22m[39m blocks a sensitive financial action (settlement decide) without a fresh step-up, then allows it after one [33m 389[2mms[22m[39m
+     [33m[2m✓[22m[39m blocks price/approve without step-up using the same guard [33m 517[2mms[22m[39m
+     [33m[2m✓[22m[39m quarantines an infected file: it stays recorded for audit but its download is blocked [33m 1638[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects a new upload once a channel's file count reaches MAX_FILES_PER_CHANNEL [33m 1450[2mms[22m[39m
+     [33m[2m✓[22m[39m rate-limits repeated internal login attempts from the same client [33m 380[2mms[22m[39m
+ [32m✓[39m src/health/health.controller.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+[90mstdout[2m | src/test/phase6.integration.test.ts[2m > [22m[2mPhase 6: tickets, notifications, surveys, and reports (integration, real DB)[2m > [22m[2mcomputes survey analytics from real submissions — started vs. submitted counts and a real option breakdown
+[22m[39m[dev-sms] template=otp-login to=+989754451502 params={"code":"338036"}
+
+ [32m✓[39m src/test/phase2.integration.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 10936[2mms[22m[39m
+     [33m[2m✓[22m[39m builds a form through the engine, publishes it, and rejects edits to the published version [33m 1228[2mms[22m[39m
+     [33m[2m✓[22m[39m autosaves, enforces required fields at submit, and creates a real revision + evaluation case [33m 3058[2mms[22m[39m
+     [33m[2m✓[22m[39m takes a correction request through field-level resubmission to a diffable second revision [33m 2244[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps a submission pinned to its original form version after a new version is published [33m 786[2mms[22m[39m
+ [32m✓[39m src/test/phase6.integration.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 12753[2mms[22m[39m
+     [33m[2m✓[22m[39m never leaks an internal note through the partner-facing ticket endpoint, while the admin endpoint sees it [33m 1188[2mms[22m[39m
+     [33m[2m✓[22m[39m deduplicates notify() calls sharing the same business dedupeKey — no duplicate Notification or delivery is ever created [33m 756[2mms[22m[39m
+     [33m[2m✓[22m[39m runs a report against the real, approved dataset registry — not a mock — and reflects the ticket created above [33m 1410[2mms[22m[39m
+     [33m[2m✓[22m[39m only the requester can export their own report run [33m 394[2mms[22m[39m
+     [33m[2m✓[22m[39m computes survey analytics from real submissions — started vs. submitted counts and a real option breakdown [33m 2754[2mms[22m[39m
+ [32m✓[39m src/test/phase4.integration.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 17175[2mms[22m[39m
+     [33m[2m✓[22m[39m persists a task, rejects an invalid dependency-violating reschedule, accepts a valid one, and surfaces the task in the unified calendar feed [33m 1072[2mms[22m[39m
+     [33m[2m✓[22m[39m drives a pin request from SCHEDULED through operator scheduling, conflict detection, execution, and completion — with the partner seeing the real schedule [33m 11607[2mms[22m[39m
+ [32m✓[39m src/test/phase5.integration.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 22230[2mms[22m[39m
+     [33m[2m✓[22m[39m posts a balanced SUPPORT_GRANTED transaction on completion, and a retry of the same posting never duplicates value [33m 6685[2mms[22m[39m
+     [33m[2m✓[22m[39m runs an obligation through propose -> accept -> deliver -> partial-approve, rejects an over-cap settlement, and completes a dual-approved partial settlement whose statement reconciles [33m 9636[2mms[22m[39m
+ [32m✓[39m src/test/phase3.integration.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 22257[2mms[22m[39m
+     [33m[2m✓[22m[39m calculates the nationwide first-position pin price as exactly 240 rial per unique view [33m 3206[2mms[22m[39m
+     [33m[2m✓[22m[39m calculates the provincial first-position pin price as exactly 480 rial per unique view [33m 1003[2mms[22m[39m
+     [33m[2m✓[22m[39m drives a pin request through approval, internal approval, and partner confirmation into a schedulable order with the exact calculated amount [33m 2332[2mms[22m[39m
+     [33m[2m✓[22m[39m requires a second, distinct approver above the second-approval threshold [33m 2290[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps an old request's snapshotted rate unchanged after the configured rate is updated for new requests [33m 3736[2mms[22m[39m
+     [33m[2m✓[22m[39m negotiates a variable multi-channel quote through multiple versions and preserves the full offer history [33m 3701[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m15 passed[39m[22m[90m (15)[39m
+[2m      Tests [22m [1m[32m77 passed[39m[22m[90m (77)[39m
+[2m   Start at [22m 04:17:55
+[2m   Duration [22m 31.45s[2m (transform 9.16s, setup 1.21s, import 57.09s, tests 96.52s, environment 3ms)[22m
+

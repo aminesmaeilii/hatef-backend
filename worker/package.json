@@ -1,0 +1,29 @@
+{
+  "name": "@hatef/worker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "dotenv -e ../../.env -- tsx watch src/main.ts",
+    "start": "dotenv -e ../../.env -- node dist/main.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@hatef/config": "workspace:*",
+    "@hatef/database": "workspace:*",
+    "@hatef/observability": "workspace:*",
+    "bullmq": "5.81.0",
+    "ioredis": "5.11.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "dotenv": "^17.4.2",
+    "tsx": "4.23.1",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10",
+    "rimraf": "6.0.1"
+  }
+}

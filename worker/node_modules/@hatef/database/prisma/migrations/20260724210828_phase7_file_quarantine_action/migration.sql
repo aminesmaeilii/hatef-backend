@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "FileAccessAction" ADD VALUE 'DOWNLOAD_BLOCKED';

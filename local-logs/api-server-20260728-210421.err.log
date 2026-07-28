@@ -1,0 +1,22 @@
+node:net:1987
+      const error = new UVExceptionWithHostPort(rval, 'listen', address, port);
+                    ^
+
+Error: listen EACCES: permission denied 0.0.0.0:4400
+    at Server.setupListenHandle [as _listen2] (node:net:1987:21)
+    at listenInCluster (node:net:2066:12)
+    at Server.listen (node:net:2171:7)
+    at ExpressAdapter.listen (E:\github\hatef-new version\node_modules\.pnpm\@nestjs+platform-express@11.1.28_@nestjs+common@11.1.28_reflect-metadata@0.2.2_rxjs@7.8.2__@nestjs+core@11.1.28\node_modules\@nestjs\platform-express\adapters\express-adapter.js:115:32)
+    at E:\github\hatef-new version\node_modules\.pnpm\@nestjs+core@11.1.28_@nestjs+common@11.1.28_reflect-metadata@0.2.2_rxjs@7.8.2__@nestjs+platfo_g4jarpxk7gcuohx5alng3oa4ye\node_modules\@nestjs\core\nest-application.js:190:30
+    at new Promise (<anonymous>)
+    at NestApplication.listen (E:\github\hatef-new version\node_modules\.pnpm\@nestjs+core@11.1.28_@nestjs+common@11.1.28_reflect-metadata@0.2.2_rxjs@7.8.2__@nestjs+platfo_g4jarpxk7gcuohx5alng3oa4ye\node_modules\@nestjs\core\nest-application.js:180:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async bootstrap (E:\github\hatef-new version\backend\api\dist\main.js:60:5) {
+  code: 'EACCES',
+  errno: -4092,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 4400
+}
+
+Node.js v24.18.0

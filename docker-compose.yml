@@ -1,0 +1,140 @@
+name: hatef
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: backend/api/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      API_PORT: 8080
+      API_URL: http://api:8080
+      DATABASE_URL: postgresql://${POSTGRES_USER:-hatef}:${POSTGRES_PASSWORD:-hatef_dev_password}@postgres:5432/${POSTGRES_DB:-hatef}?schema=public
+      REDIS_URL: redis://redis:6379
+      STORAGE_ENDPOINT: http://minio:9000
+    ports:
+      - "${API_PORT:-4000}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:8080/health/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  worker:
+    build:
+      context: ..
+      dockerfile: backend/worker/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      WORKER_PORT: 8080
+      API_URL: http://api:8080
+      DATABASE_URL: postgresql://${POSTGRES_USER:-hatef}:${POSTGRES_PASSWORD:-hatef_dev_password}@postgres:5432/${POSTGRES_DB:-hatef}?schema=public
+      REDIS_URL: redis://redis:6379
+      STORAGE_ENDPOINT: http://minio:9000
+    ports:
+      - "${WORKER_PORT:-4100}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+
+  migrate:
+    build:
+      context: ..
+      dockerfile: backend/api/Dockerfile
+    profiles: ["tools"]
+    env_file:
+      - ../.env
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-hatef}:${POSTGRES_PASSWORD:-hatef_dev_password}@postgres:5432/${POSTGRES_DB:-hatef}?schema=public
+      REDIS_URL: redis://redis:6379
+      STORAGE_ENDPOINT: http://minio:9000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["pnpm", "--filter", "@hatef/database", "db:migrate"]
+
+  seed:
+    build:
+      context: ..
+      dockerfile: backend/api/Dockerfile
+    profiles: ["tools"]
+    env_file:
+      - ../.env
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-hatef}:${POSTGRES_PASSWORD:-hatef_dev_password}@postgres:5432/${POSTGRES_DB:-hatef}?schema=public
+      REDIS_URL: redis://redis:6379
+      STORAGE_ENDPOINT: http://minio:9000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["pnpm", "--filter", "@hatef/database", "db:seed"]
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-hatef}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hatef_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-hatef}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - hatef_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hatef} -d ${POSTGRES_DB:-hatef}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  minio:
+    image: minio/minio:RELEASE.2024-12-18T13-15-44Z
+    restart: unless-stopped
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-hatef_minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-hatef_minio_password}
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - hatef_minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  hatef_postgres_data:
+  hatef_minio_data:

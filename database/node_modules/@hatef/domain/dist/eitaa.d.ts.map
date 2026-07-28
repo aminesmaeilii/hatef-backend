@@ -1,0 +1,1 @@
+{"version":3,"file":"eitaa.d.ts","sourceRoot":"","sources":["../src/eitaa.ts"],"names":[],"mappings":"AAEA,qBAAa,mBAAoB,SAAQ,KAAK;aAChB,QAAQ,EAAE,MAAM;gBAAhB,QAAQ,EAAE,MAAM;CAI7C;AAKD;;;;;GAKG;AACH,wBAAgB,gBAAgB,CAAC,QAAQ,EAAE,MAAM,GAAG,MAAM,CAiBzD;AAED,wBAAgB,cAAc,CAAC,QAAQ,EAAE,MAAM,GAAG,OAAO,CAOxD;AAED,wBAAgB,UAAU,CAAC,YAAY,EAAE,MAAM,GAAG,MAAM,CAEvD"}

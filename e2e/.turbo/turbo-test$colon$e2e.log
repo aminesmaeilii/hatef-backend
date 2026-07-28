@@ -1,0 +1,15 @@
+
+> @hatef/e2e@0.1.0 test:e2e E:\github\hatef-new version\apps\e2e
+> dotenv -e ../../.env -- playwright test
+
+[2m[WebServer] [22m[33m[1m⚠[22m[39m You are using a non-standard "NODE_ENV" value in your environment. This creates inconsistencies in the project and is strongly advised against. Read more: https://nextjs.org/docs/messages/non-standard-node-env
+[2m[WebServer] [22m[33m[1m⚠[22m[39m You are using a non-standard "NODE_ENV" value in your environment. This creates inconsistencies in the project and is strongly advised against. Read more: https://nextjs.org/docs/messages/non-standard-node-env
+
+Running 4 tests using 1 worker
+
+  ok 1 tests\cross-channel-denial.spec.ts:72:7 › Phase 1 exit proof: channel-scoped ABAC › a channel owner can read/upload in their own channel but is denied in another channel (3.3s)
+  ok 2 tests\onboarding.spec.ts:60:7 › Phase 2 exit proof: mobile onboarding, reload persistence, and a correction round trip › submits the real 28-question wizard, survives a mid-flow reload, and a correction resubmits into a diffable second revision (12.4s)
+  ok 3 tests\phase3-support-request.spec.ts:37:7 › Phase 3 exit proof: real first-position pin request through the partner UI › a real channel owner picks the pin type, sees the live published rate, submits, and lands on a real progress page (3.0s)
+  ok 4 tests\phase4-gantt-reschedule.spec.ts:63:7 › Phase 4 exit proof: the Gantt's real drag-to-reschedule, backed by validated transition APIs › a real mouse drag reschedules the task in the backend; dragging it into an illegal position is rejected and the bar's real date is untouched (2.1s)
+
+  4 passed (35.3s)

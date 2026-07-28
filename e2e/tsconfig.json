@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "target": "ES2022",
+    "outDir": "dist",
+    "rootDir": ".",
+    "baseUrl": "./",
+    "types": ["node", "@playwright/test"]
+  },
+  "include": ["playwright.config.ts", "tests"]
+}

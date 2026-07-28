@@ -1,0 +1,3 @@
+pid=6688
+log=E:\github\hatef-new version\dev-server-20260728-210305.log
+err=E:\github\hatef-new version\dev-server-20260728-210305.err.log

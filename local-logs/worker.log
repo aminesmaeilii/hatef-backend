@@ -1,0 +1,11 @@
+
+> @hatef/worker@0.1.0 dev E:\github\hatef-new version\backend\worker
+> dotenv -e ../../.env -- tsx watch src/main.ts
+
+[2026-07-28 22:34:36.415 +0330] [32mINFO[39m (worker): [36mconnected to PostgreSQL[39m
+    [35mservice[39m: "worker"
+[2026-07-28 22:34:36.436 +0330] [32mINFO[39m (worker): [36moutbox relay and worker started[39m
+    [35mservice[39m: "worker"
+[2026-07-28 22:34:36.439 +0330] [32mINFO[39m (worker): [36mworker health server listening[39m
+    [35mservice[39m: "worker"
+    [35mport[39m: 5301

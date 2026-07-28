@@ -1,0 +1,29 @@
+
+> @hatef/worker@0.1.0 test E:\github\hatef-new version\backend\worker
+> vitest run --passWithNoTests
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90mE:/github/hatef-new version/backend/worker[39m
+
+[90mstdout[2m | src/reports/handlers.test.ts
+[22m[39m◇ injected env (52) from ..\..\.env // tip: ◈ secrets for agents [www.dotenvx.com]
+
+[90mstdout[2m | src/notifications/handlers.test.ts
+[22m[39m◇ injected env (52) from ..\..\.env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
+
+[90mstdout[2m | src/notifications/handlers.test.ts[2m > [22m[2mcreateNotificationDeliverHandler (real DB, dev SMS provider)[2m > [22m[2mdelivers an SMS notification via the dev provider and writes a real SmsDeliveryLog row
+[22m[39m[dev-sms] template=test.event to=+989128757947 params={"title":"t","body":"b"}
+
+ [32m✓[39m src/reports/handlers.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 2149[2mms[22m[39m
+     [33m[2m✓[22m[39m executes the ticket_sla dataset against real ticket rows and completes the run with the exact live counts [33m 1176[2mms[22m[39m
+     [33m[2m✓[22m[39m fails a run for an unknown dataset key rather than silently returning empty data [33m 597[2mms[22m[39m
+ [32m✓[39m src/notifications/handlers.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 3652[2mms[22m[39m
+     [33m[2m✓[22m[39m delivers an IN_APP notification by marking it SENT — no external call needed [33m 760[2mms[22m[39m
+     [33m[2m✓[22m[39m delivers an SMS notification via the dev provider and writes a real SmsDeliveryLog row [33m 682[2mms[22m[39m
+     [33m[2m✓[22m[39m fails gracefully (no throw) when the user has no mobile contact on file [33m 459[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[32m6 passed[39m[22m[90m (6)[39m
+[2m   Start at [22m 04:17:55
+[2m   Duration [22m 5.77s[2m (transform 230ms, setup 137ms, import 1.48s, tests 5.80s, environment 0ms)[22m
+
