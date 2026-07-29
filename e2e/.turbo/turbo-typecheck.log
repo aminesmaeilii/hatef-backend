@@ -1,4 +1,0 @@
-
-> @hatef/e2e@0.1.0 typecheck E:\github\hatef-new version\backend\e2e
-> tsc -p tsconfig.json --noEmit
-

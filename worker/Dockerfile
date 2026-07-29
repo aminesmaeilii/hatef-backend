@@ -1,6 +1,6 @@
 FROM node:24-alpine AS deps
 WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
+RUN npm install -g pnpm@9.15.4
 RUN pnpm config set fetch-retries 5 \
   && pnpm config set fetch-retry-factor 2 \
   && pnpm config set fetch-retry-mintimeout 10000 \
@@ -19,12 +19,6 @@ RUN pnpm --filter @hatef/worker... build
 FROM node:24-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
-RUN pnpm config set fetch-retries 5 \
-  && pnpm config set fetch-retry-factor 2 \
-  && pnpm config set fetch-retry-mintimeout 10000 \
-  && pnpm config set fetch-retry-maxtimeout 120000 \
-  && pnpm config set network-timeout 300000
 COPY --from=build /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml /app/tsconfig.base.json ./
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/config ./config

@@ -1,6 +1,7 @@
 node_modules/
 .pnpm-store/
 .turbo/
+e2e/.turbo/
 dist/
 build/
 coverage/
