@@ -1,4 +1,4 @@
-name: Build and deploy backend
+name: Build backend image
 
 on:
   push:
@@ -11,30 +11,17 @@ permissions:
   packages: write
 
 concurrency:
-  group: hatef-backend-production
+  group: hatef-backend-image-build
   cancel-in-progress: true
 
-env:
-  LIARA_APP_NAME: ${{ vars.LIARA_APP_NAME || 'hatef-backend' }}
-  LIARA_PORT: "8080"
-
 jobs:
-  build-and-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Validate deployment configuration
-        env:
-          LIARA_TOKEN: ${{ secrets.LIARA_API_TOKEN }}
-        run: |
-          if [ -z "$LIARA_TOKEN" ]; then
-            echo "::error::LIARA_API_TOKEN repository secret is required."
-            exit 1
-          fi
 
       - name: Prepare image name
         id: image
@@ -64,23 +51,3 @@ jobs:
           labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-
-      - name: Install Liara CLI
-        run: npm install --global @liara/cli@9
-
-      - name: Deploy image to Liara
-        env:
-          LIARA_TOKEN: ${{ secrets.LIARA_API_TOKEN }}
-          IMAGE: ${{ steps.image.outputs.name }}:${{ github.sha }}
-        run: |
-          liara deploy \
-            --app="$LIARA_APP_NAME" \
-            --image="$IMAGE" \
-            --port="$LIARA_PORT" \
-            --api-token="$LIARA_TOKEN" \
-            --no-app-logs
