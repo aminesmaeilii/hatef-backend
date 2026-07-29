@@ -52,6 +52,49 @@ describe("loadEnv", () => {
     expect(env.NODE_ENV).toBe("production");
   });
 
+  it("normalizes Liara Redis and object storage variable names", () => {
+    const env = loadEnv({
+      ...validBaseEnv,
+      REDIS_URL: undefined,
+      STORAGE_ENDPOINT: undefined,
+      STORAGE_REGION: undefined,
+      STORAGE_PROVIDER: undefined,
+      STORAGE_FORCE_PATH_STYLE: undefined,
+      REDIS_HOST: "hatef",
+      REDIS_PORT: "6379",
+      REDIS_PASSWORD: "secret password",
+      STORAGE_API_ENDPOINT: "storage.c2.liara.site",
+    });
+
+    expect(env.REDIS_URL).toBe("redis://:secret%20password@hatef:6379");
+    expect(env.STORAGE_ENDPOINT).toBe("https://storage.c2.liara.site");
+    expect(env.STORAGE_PROVIDER).toBe("s3");
+    expect(env.STORAGE_REGION).toBe("default");
+    expect(env.STORAGE_FORCE_PATH_STYLE).toBe(true);
+  });
+
+  it("uses Liara PORT as a fallback for service-specific ports", () => {
+    const env = loadEnv({
+      ...validBaseEnv,
+      API_PORT: undefined,
+      WORKER_PORT: undefined,
+      PORT: "8080",
+    });
+
+    expect(env.API_PORT).toBe(8080);
+    expect(env.WORKER_PORT).toBe(8080);
+  });
+
+  it("uses the admin web URL as the partner URL fallback for a single frontend app", () => {
+    const env = loadEnv({
+      ...validBaseEnv,
+      PARTNER_WEB_URL: undefined,
+      ADMIN_WEB_URL: "https://hatef-eitaa.liara.run",
+    });
+
+    expect(env.PARTNER_WEB_URL).toBe("https://hatef-eitaa.liara.run");
+  });
+
   it("refuses to start in production with the fake antivirus provider", () => {
     expect(() =>
       loadEnv({

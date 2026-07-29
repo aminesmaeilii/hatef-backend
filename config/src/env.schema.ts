@@ -1,10 +1,53 @@
 import { z } from "zod";
 
+type EnvSource = NodeJS.ProcessEnv;
+
 function booleanFromString(defaultValue: "true" | "false") {
   return z
     .enum(["true", "false"])
     .default(defaultValue)
     .transform((value) => value === "true");
+}
+
+function normalizeEnv(source: EnvSource): EnvSource {
+  const normalized: EnvSource = { ...source };
+
+  if (!normalized.REDIS_URL && normalized.REDIS_HOST) {
+    const port = normalized.REDIS_PORT || "6379";
+    const password = normalized.REDIS_PASSWORD ? `:${encodeURIComponent(normalized.REDIS_PASSWORD)}@` : "";
+    normalized.REDIS_URL = `redis://${password}${normalized.REDIS_HOST}:${port}`;
+  }
+
+  if (!normalized.API_PORT && normalized.PORT) {
+    normalized.API_PORT = normalized.PORT;
+  }
+
+  if (!normalized.WORKER_PORT && normalized.PORT) {
+    normalized.WORKER_PORT = normalized.PORT;
+  }
+
+  if (!normalized.PARTNER_WEB_URL && normalized.ADMIN_WEB_URL) {
+    normalized.PARTNER_WEB_URL = normalized.ADMIN_WEB_URL;
+  }
+
+  if (!normalized.STORAGE_ENDPOINT && normalized.STORAGE_API_ENDPOINT) {
+    const endpoint = normalized.STORAGE_API_ENDPOINT;
+    normalized.STORAGE_ENDPOINT = /^https?:\/\//.test(endpoint) ? endpoint : `https://${endpoint}`;
+  }
+
+  if (!normalized.STORAGE_PROVIDER && normalized.STORAGE_API_ENDPOINT) {
+    normalized.STORAGE_PROVIDER = "s3";
+  }
+
+  if (!normalized.STORAGE_REGION && normalized.STORAGE_API_ENDPOINT) {
+    normalized.STORAGE_REGION = "default";
+  }
+
+  if (!normalized.STORAGE_FORCE_PATH_STYLE && normalized.STORAGE_API_ENDPOINT) {
+    normalized.STORAGE_FORCE_PATH_STYLE = "true";
+  }
+
+  return normalized;
 }
 
 export const envSchema = z.object({
@@ -86,8 +129,8 @@ const KNOWN_DEV_SECRETS = [
  * guarantees that cannot be expressed as pure schema rules (cross-field
  * checks against NODE_ENV).
  */
-export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
-  const parsed = envSchema.safeParse(source);
+export function loadEnv(source: EnvSource = process.env): Env {
+  const parsed = envSchema.safeParse(normalizeEnv(source));
 
   if (!parsed.success) {
     const message = parsed.error.issues
