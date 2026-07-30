@@ -4,12 +4,14 @@ import { PrismaClient } from "../generated/client/index";
 const prisma = new PrismaClient();
 
 async function main() {
-  const email = "test@gmail.com";
-  const password = "test";
+  const email = "admin@hatef.test";
+  const password = "admin";
 
   let user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    user = await prisma.user.create({ data: { displayName: "مدیر تست", email } });
+    user = await prisma.user.create({ data: { displayName: "Test Admin", email } });
+  } else if (user.displayName !== "Test Admin") {
+    user = await prisma.user.update({ where: { id: user.id }, data: { displayName: "Test Admin" } });
   }
 
   const passwordHash = await hashPassword(password);
