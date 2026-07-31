@@ -41,7 +41,7 @@ export class InternalAuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<InternalLoginResponse> {
-    const result = await this.internalAuth.login(body.mobile, body.password, req.ip);
+    const result = await this.internalAuth.login(body.email, body.password, req.ip);
     if (result.status === "mfa_required") {
       return { status: "mfa_required", mfaToken: result.mfaToken };
     }

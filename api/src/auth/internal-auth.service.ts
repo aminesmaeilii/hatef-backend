@@ -15,7 +15,6 @@ import {
   verifyTotpCode,
 } from "@hatef/auth";
 import type { MfaEnrollResponse } from "@hatef/contracts";
-import { normalizeIranianMobile } from "@hatef/domain";
 import { PrismaService } from "../prisma/prisma.service";
 import { RedisService } from "../redis/redis.service";
 import { AppConfigService } from "../config/app-config.service";
@@ -41,19 +40,14 @@ export class InternalAuthService {
     private readonly auditLog: AuditLogService,
   ) {}
 
-  async login(rawMobile: string, password: string, ip?: string): Promise<InternalLoginResult> {
+  async login(rawEmail: string, password: string, ip?: string): Promise<InternalLoginResult> {
     const genericError = () => new UnauthorizedException("ایمیل یا رمز عبور نادرست است.");
 
-    const mobile = normalizeIranianMobile(rawMobile);
-    const contact = await this.prisma.userContact.findUnique({
-      where: { type_value: { type: "MOBILE", value: mobile } },
+    const email = rawEmail.trim().toLowerCase();
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      include: { adminCredential: true, mfaMethods: true },
     });
-    const user = contact
-      ? await this.prisma.user.findUnique({
-          where: { id: contact.userId },
-          include: { adminCredential: true, mfaMethods: true },
-        })
-      : null;
 
     if (!user || !user.adminCredential) {
       await verifyPassword(await DUMMY_HASH_PROMISE, password);

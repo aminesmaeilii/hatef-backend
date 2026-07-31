@@ -33,7 +33,7 @@ export const authSessionResponseSchema = z.object({
 export type AuthSessionResponse = z.infer<typeof authSessionResponseSchema>;
 
 export const internalLoginSchema = z.object({
-  mobile: z.string().min(1),
+  email: z.email(),
   password: z.string().min(1),
 });
 export type InternalLogin = z.infer<typeof internalLoginSchema>;
