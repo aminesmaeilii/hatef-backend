@@ -90,6 +90,7 @@ export const envSchema = z.object({
   SMS_PROVIDER_USERNAME: z.string().optional().default(""),
   SMS_PROVIDER_PASSWORD: z.string().optional().default(""),
   SMS_PROVIDER_SENDER: z.string().optional().default(""),
+  // MeliPayamak BaseServiceNumber/bodyId used for the OTP-login pattern.
   SMS_TEMPLATE_OTP_ID: z.string().optional().default(""),
 
   ANTIVIRUS_PROVIDER: z.enum(["dev", "live"]).default("dev"),

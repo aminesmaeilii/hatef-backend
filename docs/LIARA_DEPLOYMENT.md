@@ -44,8 +44,11 @@ Production environment notes:
 - For ملی‌پیامک OTP delivery, set these on the API app environment:
   `SMS_PROVIDER=live`, `FEATURE_SMS_PROVIDER_LIVE=true`,
   `SMS_PROVIDER_USERNAME`, `SMS_PROVIDER_API_KEY` (or `SMS_PROVIDER_PASSWORD`),
-  `SMS_PROVIDER_SENDER`, and optionally `SMS_TEMPLATE_OTP_ID`. The frontend apps do not need SMS
-  credentials. If ملی‌پیامک asks for an IP allowlist, put the public outbound
+  `SMS_PROVIDER_SENDER`, and `SMS_TEMPLATE_OTP_ID` if you use a services-line
+  OTP pattern. `SMS_TEMPLATE_OTP_ID` is the ملی‌پیامک
+  `BaseServiceNumber`/`bodyId`. Put the same SMS variables on the Worker app
+  too if SMS notification delivery is enabled there. The frontend apps do not
+  need SMS credentials. If ملی‌پیامک asks for an IP allowlist, put the public outbound
   IP of the deployed API server in the ملی‌پیامک panel.
 - The API health check is `GET /health/ready`; web apps can use `/`.
 - Keep the worker internal if possible; its HTTP surface is only `/health`.

@@ -3,7 +3,7 @@ import { AppConfigService } from "../config/app-config.service";
 import type { SendSmsParams, SendSmsResult, SmsProvider } from "./sms-provider.interface";
 
 const MELIPAYAMAK_SEND_URL = "https://rest.payamak-panel.com/api/SendSMS/SendSMS";
-const MELIPAYAMAK_OTP_URL = "https://rest.payamak-panel.com/api/SendSMS/SendOtp";
+const MELIPAYAMAK_BASE_SERVICE_URL = "https://rest.payamak-panel.com/api/SendSMS/BaseServiceNumber";
 
 interface MelipayamakSendResponse {
   Value: string;
@@ -27,17 +27,23 @@ export class LiveSmsProvider implements SmsProvider {
   constructor(private readonly config: AppConfigService) {}
 
   async send(params: SendSmsParams): Promise<SendSmsResult> {
-    const { SMS_PROVIDER_API_KEY, SMS_PROVIDER_USERNAME, SMS_PROVIDER_PASSWORD, SMS_PROVIDER_SENDER } = this.config.env;
+    const {
+      SMS_PROVIDER_API_KEY,
+      SMS_PROVIDER_USERNAME,
+      SMS_PROVIDER_PASSWORD,
+      SMS_PROVIDER_SENDER,
+      SMS_TEMPLATE_OTP_ID,
+    } = this.config.env;
     const password = SMS_PROVIDER_API_KEY || SMS_PROVIDER_PASSWORD;
     if (!SMS_PROVIDER_USERNAME || !password || !SMS_PROVIDER_SENDER) {
       throw new Error("SMS_PROVIDER_USERNAME/API_KEY_OR_PASSWORD/SENDER is not configured for the live SMS provider");
     }
 
     try {
-      return await this.dispatch(params, SMS_PROVIDER_USERNAME, password, SMS_PROVIDER_SENDER);
+      return await this.dispatch(params, SMS_PROVIDER_USERNAME, password, SMS_PROVIDER_SENDER, SMS_TEMPLATE_OTP_ID);
     } catch {
       this.logger.warn(`Live SMS dispatch failed, retrying once (template=${params.templateId})`);
-      return this.dispatch(params, SMS_PROVIDER_USERNAME, password, SMS_PROVIDER_SENDER);
+      return this.dispatch(params, SMS_PROVIDER_USERNAME, password, SMS_PROVIDER_SENDER, SMS_TEMPLATE_OTP_ID);
     }
   }
 
@@ -46,21 +52,22 @@ export class LiveSmsProvider implements SmsProvider {
     username: string,
     password: string,
     sender: string,
+    otpBodyId: string,
   ): Promise<SendSmsResult> {
     if (params.params.code) {
-      return dispatchOtp(params, username, password, sender);
+      return dispatchOtp(params, username, password, sender, otpBodyId);
     }
 
     const response = await fetch(MELIPAYAMAK_SEND_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+      headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+      body: new URLSearchParams({
         username,
         password,
         to: params.mobile,
         from: sender,
         text: renderTemplate(params),
-        isflash: false,
+        isFlash: "false",
       }),
     });
 
@@ -87,21 +94,58 @@ async function dispatchOtp(
   username: string,
   password: string,
   sender: string,
+  otpBodyId: string,
 ): Promise<SendSmsResult> {
   const code = params.params.code;
   if (!code) {
     throw new Error("OTP code is required for the live SMS OTP provider");
   }
 
-  const response = await fetch(MELIPAYAMAK_OTP_URL, {
+  if (otpBodyId) {
+    return dispatchBaseServiceOtp(params.mobile, code, username, password, otpBodyId);
+  }
+
+  const response = await fetch(MELIPAYAMAK_SEND_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
     body: new URLSearchParams({
       username,
       password,
       to: params.mobile,
       from: sender,
-      code,
+      text: code,
+      isFlash: "false",
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`SMS provider responded with HTTP ${response.status}`);
+  }
+
+  const providerMessageId = (await response.text()).trim().replace(/^"|"$/g, "");
+  if (!/^\d+$/.test(providerMessageId)) {
+    throw new Error(`SMS provider rejected the OTP message (${providerMessageId})`);
+  }
+
+  return { providerMessageId };
+}
+
+async function dispatchBaseServiceOtp(
+  mobile: string,
+  code: string,
+  username: string,
+  password: string,
+  bodyId: string,
+): Promise<SendSmsResult> {
+  const response = await fetch(MELIPAYAMAK_BASE_SERVICE_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+    body: new URLSearchParams({
+      username,
+      password,
+      text: code,
+      to: mobile,
+      bodyId,
     }),
   });
 

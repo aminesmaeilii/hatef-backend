@@ -12,7 +12,7 @@ export interface SendSmsResult {
 }
 
 const MELIPAYAMAK_SEND_URL = "https://rest.payamak-panel.com/api/SendSMS/SendSMS";
-const MELIPAYAMAK_OTP_URL = "https://rest.payamak-panel.com/api/SendSMS/SendOtp";
+const MELIPAYAMAK_BASE_SERVICE_URL = "https://rest.payamak-panel.com/api/SendSMS/BaseServiceNumber";
 
 interface MelipayamakSendResponse {
   Value: string;
@@ -41,9 +41,9 @@ export async function sendSms(env: Env, params: SendSmsParams): Promise<SendSmsR
   }
 
   try {
-    return await dispatch(params, env.SMS_PROVIDER_USERNAME, password, env.SMS_PROVIDER_SENDER);
+    return await dispatch(params, env.SMS_PROVIDER_USERNAME, password, env.SMS_PROVIDER_SENDER, env.SMS_TEMPLATE_OTP_ID);
   } catch {
-    return dispatch(params, env.SMS_PROVIDER_USERNAME, password, env.SMS_PROVIDER_SENDER);
+    return dispatch(params, env.SMS_PROVIDER_USERNAME, password, env.SMS_PROVIDER_SENDER, env.SMS_TEMPLATE_OTP_ID);
   }
 }
 
@@ -52,21 +52,22 @@ async function dispatch(
   username: string,
   password: string,
   sender: string,
+  otpBodyId: string,
 ): Promise<SendSmsResult> {
   if (params.params.code) {
-    return dispatchOtp(params, username, password, sender);
+    return dispatchOtp(params, username, password, sender, otpBodyId);
   }
 
   const response = await fetch(MELIPAYAMAK_SEND_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
+    headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+    body: new URLSearchParams({
       username,
       password,
       to: params.mobile,
       from: sender,
       text: params.params.body ?? params.params.code ?? Object.values(params.params).join(" "),
-      isflash: false,
+      isFlash: "false",
     }),
   });
   if (!response.ok) {
@@ -84,21 +85,55 @@ async function dispatchOtp(
   username: string,
   password: string,
   sender: string,
+  otpBodyId: string,
 ): Promise<SendSmsResult> {
   const code = params.params.code;
   if (!code) {
     throw new Error("OTP code is required for the live SMS OTP provider");
   }
 
-  const response = await fetch(MELIPAYAMAK_OTP_URL, {
+  if (otpBodyId) {
+    return dispatchBaseServiceOtp(params.mobile, code, username, password, otpBodyId);
+  }
+
+  const response = await fetch(MELIPAYAMAK_SEND_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
     body: new URLSearchParams({
       username,
       password,
       to: params.mobile,
       from: sender,
-      code,
+      text: code,
+      isFlash: "false",
+    }),
+  });
+  if (!response.ok) {
+    throw new Error(`SMS provider responded with HTTP ${response.status}`);
+  }
+  const providerMessageId = (await response.text()).trim().replace(/^"|"$/g, "");
+  if (!/^\d+$/.test(providerMessageId)) {
+    throw new Error(`SMS provider rejected the OTP message (${providerMessageId})`);
+  }
+  return { providerMessageId };
+}
+
+async function dispatchBaseServiceOtp(
+  mobile: string,
+  code: string,
+  username: string,
+  password: string,
+  bodyId: string,
+): Promise<SendSmsResult> {
+  const response = await fetch(MELIPAYAMAK_BASE_SERVICE_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+    body: new URLSearchParams({
+      username,
+      password,
+      text: code,
+      to: mobile,
+      bodyId,
     }),
   });
   if (!response.ok) {
