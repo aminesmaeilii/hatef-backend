@@ -1,5 +1,5 @@
 {
-  "app": "hatef-api",
+  "app": "backend-hatef",
   "port": 8080,
   "build": {
     "location": "iran"
