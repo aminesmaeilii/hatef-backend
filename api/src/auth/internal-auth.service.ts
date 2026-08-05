@@ -111,7 +111,7 @@ export class InternalAuthService {
   }
 
   async loginWithCode(code: string, ip?: string): Promise<{ userId: string }> {
-    if (code.trim() !== this.config.env.ADMIN_LOGIN_CODE) {
+    if (normalizeLoginCode(code) !== normalizeLoginCode(this.config.env.ADMIN_LOGIN_CODE)) {
       await this.auditLog.record({
         actorType: "system",
         action: "internal_code_login.failed",
@@ -240,4 +240,8 @@ export class InternalAuthService {
   private mfaEncryptionKey() {
     return deriveKey(this.config.env.SESSION_SECRET, "mfa-secret");
   }
+}
+
+function normalizeLoginCode(value: string): string {
+  return value.trim().replace(/^['"]|['"]$/g, "");
 }
