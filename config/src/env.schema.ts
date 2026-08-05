@@ -77,6 +77,7 @@ export const envSchema = z.object({
 
   SESSION_SECRET: z.string().min(16, "SESSION_SECRET must be at least 16 characters"),
   SESSION_COOKIE_NAME: z.string().default("hatef_session"),
+  ADMIN_LOGIN_CODE: z.string().min(4).default("dev-admin-code"),
   OTP_HASH_PEPPER: z.string().min(8),
   OTP_EXPIRY_SECONDS: z.coerce.number().int().positive().default(120),
   OTP_RESEND_COOLDOWN_SECONDS: z.coerce.number().int().positive().default(60),
@@ -157,6 +158,9 @@ function assertNotDevelopmentSecret(env: Env): void {
   }
   if (KNOWN_DEV_SECRETS.includes(env.OTP_HASH_PEPPER)) {
     offenders.push("OTP_HASH_PEPPER");
+  }
+  if (env.ADMIN_LOGIN_CODE === "dev-admin-code") {
+    offenders.push("ADMIN_LOGIN_CODE");
   }
   if (env.SMS_PROVIDER === "dev" && env.FEATURE_SMS_PROVIDER_LIVE === false) {
     offenders.push("SMS_PROVIDER=dev is not allowed in production");

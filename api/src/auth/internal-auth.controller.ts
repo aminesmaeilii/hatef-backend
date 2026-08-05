@@ -2,10 +2,12 @@ import { Body, Controller, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { Throttle } from "@nestjs/throttler";
 import type { Request, Response } from "express";
 import {
+  adminCodeLoginSchema,
   internalLoginSchema,
   mfaEnrollConfirmSchema,
   mfaVerifySchema,
   stepUpSchema,
+  type AdminCodeLogin,
   type AuthSessionResponse,
   type InternalLogin,
   type InternalLoginResponse,
@@ -34,6 +36,17 @@ export class InternalAuthController {
   // Tighter than the global default — email/password login is a classic
   // credential-stuffing target and has no other rate limit (unlike the
   // partner OTP flow, which is already Redis-limited in OtpService).
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @Post("code-login")
+  async codeLogin(
+    @Body(new ZodValidationPipe(adminCodeLoginSchema)) body: AdminCodeLogin,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<AuthSessionResponse> {
+    const { userId } = await this.internalAuth.loginWithCode(body.code, req.ip);
+    return this.sessions.issueSession(userId, req, res);
+  }
+
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @Post("login")
   async login(

@@ -141,7 +141,7 @@ export class FormSubmissionsService {
     acceptedConsentDocumentIds: string[],
     actor: RequestActor,
     ip?: string,
-  ): Promise<void> {
+  ): Promise<{ trackingCode: string }> {
     const submission = await this.getOwnedSubmissionOrThrow(channelId, submissionId);
     const definition = await assembleFormVersionDefinition(this.prisma, submission.formVersionId);
     const allFields = definition.pages.flatMap((p) => p.sections).flatMap((s) => s.fields);
@@ -227,6 +227,8 @@ export class FormSubmissionsService {
       metadata: { revisionNumber: nextRevisionNumber },
       ipAddress: ip,
     });
+
+    return { trackingCode: submissionId };
   }
 
   /** Narrow, named special case — the one form field with a real 1:1 mapping onto Channel.eitaaId. Not a generic form↔entity sync mechanism. */

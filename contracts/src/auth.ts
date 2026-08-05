@@ -38,11 +38,21 @@ export const internalLoginSchema = z.object({
 });
 export type InternalLogin = z.infer<typeof internalLoginSchema>;
 
+export const adminCodeLoginSchema = z.object({
+  code: z.string().min(4).max(64),
+});
+export type AdminCodeLogin = z.infer<typeof adminCodeLoginSchema>;
+
 export const internalLoginResponseSchema = z.discriminatedUnion("status", [
   z.object({ status: z.literal("mfa_required"), mfaToken: z.string() }),
   z.object({ status: z.literal("ok"), user: sessionUserSchema, csrfToken: z.string() }),
 ]);
 export type InternalLoginResponse = z.infer<typeof internalLoginResponseSchema>;
+
+export const partnerTrackingLoginSchema = z.object({
+  trackingCode: z.string().min(1).max(128),
+});
+export type PartnerTrackingLogin = z.infer<typeof partnerTrackingLoginSchema>;
 
 export const mfaVerifySchema = z.object({
   mfaToken: z.string().min(1),

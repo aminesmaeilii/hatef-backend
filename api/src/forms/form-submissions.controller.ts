@@ -54,7 +54,7 @@ export class FormSubmissionsController {
     @CurrentActor() actor: RequestActor,
     @Req() req: Request,
   ) {
-    await this.formSubmissions.submit(channelId, submissionId, body.acceptedConsentDocumentIds, actor, req.ip);
-    return { ok: true };
+    const result = await this.formSubmissions.submit(channelId, submissionId, body.acceptedConsentDocumentIds, actor, req.ip);
+    return { ok: true, ...result };
   }
 }

@@ -110,6 +110,36 @@ export class InternalAuthService {
     return { status: "ok", userId: user.id };
   }
 
+  async loginWithCode(code: string, ip?: string): Promise<{ userId: string }> {
+    if (code.trim() !== this.config.env.ADMIN_LOGIN_CODE) {
+      await this.auditLog.record({
+        actorType: "system",
+        action: "internal_code_login.failed",
+        entityType: "user",
+        ipAddress: ip,
+      });
+      throw new UnauthorizedException("کد ورود مدیریت نادرست است.");
+    }
+
+    const assignment = await this.prisma.roleAssignment.findFirst({
+      where: { role: { key: "SUPER_ADMIN" }, resourceType: null, resourceId: null },
+      orderBy: { createdAt: "asc" },
+    });
+    if (!assignment) {
+      throw new UnauthorizedException("کاربر مدیر برای ورود با کد پیدا نشد.");
+    }
+
+    await this.auditLog.record({
+      actorId: assignment.userId,
+      actorType: "user",
+      action: "internal_code_login.success",
+      entityType: "user",
+      entityId: assignment.userId,
+      ipAddress: ip,
+    });
+    return { userId: assignment.userId };
+  }
+
   async verifyMfa(mfaToken: string, code: string, ip?: string): Promise<{ userId: string }> {
     const userId = await this.redis.client.get(`mfa:pending:${mfaToken}`);
     if (!userId) {
