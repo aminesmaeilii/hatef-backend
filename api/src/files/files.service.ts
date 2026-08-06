@@ -1,5 +1,12 @@
 import { randomUUID, createHash } from "node:crypto";
-import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException, PayloadTooLargeException } from "@nestjs/common";
+import {
+  BadRequestException,
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  PayloadTooLargeException,
+} from "@nestjs/common";
 import type { FileAsset } from "@hatef/contracts";
 import type { FileAsset as PrismaFileAsset } from "@hatef/database";
 import { PrismaService } from "../prisma/prisma.service";
@@ -51,7 +58,16 @@ export class FilesService {
     const scanStatus: PrismaFileAsset["scanStatus"] = scan.clean ? "CLEAN" : "INFECTED";
     const storageKey = `${scanStatus === "CLEAN" ? "uploads" : "quarantine"}/${channelId}/${randomUUID()}-${safeName}`;
 
-    await this.storage.putObject(storageKey, file.buffer, sniffed);
+    try {
+      await this.storage.putObject(storageKey, file.buffer, sniffed);
+    } catch (error) {
+      throw new BadRequestException({
+        code: "STORAGE_UPLOAD_FAILED",
+        message:
+          "بارگذاری فایل در فضای ابری ناموفق بود. لطفاً تنظیمات Object Storage لیارا را بررسی کنید.",
+        cause: error instanceof Error ? error.message : String(error),
+      });
+    }
 
     const asset = await this.prisma.fileAsset.create({
       data: {
@@ -118,6 +134,12 @@ export class FilesService {
 
     const downloadUrl = await this.storage.getSignedDownloadUrl(asset.storageKey);
     return toFileDto(asset, downloadUrl);
+  }
+
+  async getCleanDownloadUrl(channelId: string, fileId: string): Promise<string | null> {
+    const asset = await this.prisma.fileAsset.findFirst({ where: { id: fileId, channelId, scanStatus: "CLEAN" } });
+    if (!asset) return null;
+    return this.storage.getSignedDownloadUrl(asset.storageKey);
   }
 }
 

@@ -5,12 +5,17 @@ import type { Channel as PrismaChannel } from "@hatef/database";
 import { PrismaService } from "../prisma/prisma.service";
 import { AuditLogService } from "../audit/audit-log.service";
 import type { RequestActor } from "../session/actor.types";
+import { FilesService } from "../files/files.service";
+
+const ONBOARDING_FORM_KEY = "channel-onboarding";
+const CHANNEL_PROFILE_IMAGE_FIELD_KEY = "channel_profile_image";
 
 @Injectable()
 export class ChannelsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly auditLog: AuditLogService,
+    private readonly files: FilesService,
   ) {}
 
   async create(input: CreateChannel, actor: RequestActor): Promise<Channel> {
@@ -26,17 +31,17 @@ export class ChannelsService {
       entityId: channel.id,
     });
 
-    return toChannelDto(channel);
+    return this.toChannelDto(channel);
   }
 
   async listAll(): Promise<Channel[]> {
     const channels = await this.prisma.channel.findMany({ orderBy: { createdAt: "desc" } });
-    return channels.map(toChannelDto);
+    return Promise.all(channels.map((channel) => this.toChannelDto(channel)));
   }
 
   async getOne(channelId: string): Promise<Channel> {
     const channel = await this.prisma.channel.findUniqueOrThrow({ where: { id: channelId } });
-    return toChannelDto(channel);
+    return this.toChannelDto(channel);
   }
 
   async listMemberships(channelId: string): Promise<(Membership & { userDisplayName: string })[]> {
@@ -107,14 +112,32 @@ export class ChannelsService {
       status: membership.status,
     };
   }
-}
+  private async toChannelDto(channel: PrismaChannel): Promise<Channel> {
+    return {
+      id: channel.id,
+      title: channel.title,
+      eitaaId: channel.eitaaId,
+      status: channel.status,
+      createdAt: channel.createdAt.toISOString(),
+      profileImageUrl: await this.getProfileImageUrl(channel.id),
+    };
+  }
 
-function toChannelDto(channel: PrismaChannel): Channel {
-  return {
-    id: channel.id,
-    title: channel.title,
-    eitaaId: channel.eitaaId,
-    status: channel.status,
-    createdAt: channel.createdAt.toISOString(),
-  };
+  private async getProfileImageUrl(channelId: string): Promise<string | null> {
+    const answer = await this.prisma.formAnswer.findFirst({
+      where: {
+        formSubmission: { channelId, formVersion: { form: { key: ONBOARDING_FORM_KEY } } },
+        formField: { key: CHANNEL_PROFILE_IMAGE_FIELD_KEY },
+      },
+      orderBy: { updatedAt: "desc" },
+    });
+    const fileId = (answer?.value as { fileId?: unknown } | null)?.fileId;
+    if (typeof fileId !== "string") return null;
+
+    try {
+      return await this.files.getCleanDownloadUrl(channelId, fileId);
+    } catch {
+      return null;
+    }
+  }
 }

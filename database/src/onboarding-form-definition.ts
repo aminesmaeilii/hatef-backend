@@ -96,7 +96,7 @@ export const ONBOARDING_PAGES: PageSeed[] = [
         fields: [
           {
             key: "admin_qualified",
-            label: "آیا مدیر فعلی برای پیشبرد اهداف کانال صلاحیت دارد؟",
+            label: "آیا ادمین فعلی برای پیشبرد اهداف کانال صلاحیت دارد؟",
             type: "SINGLE_SELECT",
             required: true,
             options: [
@@ -105,7 +105,7 @@ export const ONBOARDING_PAGES: PageSeed[] = [
               { value: "no", label: "خیر" },
             ],
           },
-          { key: "admin_action_plan", label: "چه اقدامی برای تأمین مدیر مناسب انجام خواهد شد؟", type: "LONG_TEXT" },
+          { key: "admin_action_plan", label: "چه اقدامی برای تأمین ادمین مناسب انجام خواهد شد؟", type: "LONG_TEXT" },
           {
             key: "specialist_domain",
             label: "حوزه تخصصی",

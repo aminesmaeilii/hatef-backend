@@ -6,6 +6,7 @@ export const channelSchema = z.object({
   eitaaId: z.string(),
   status: z.enum(["PENDING", "ACTIVE", "SUSPENDED"]),
   createdAt: z.iso.datetime(),
+  profileImageUrl: z.string().nullable(),
 });
 export type Channel = z.infer<typeof channelSchema>;
 
