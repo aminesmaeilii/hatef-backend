@@ -650,6 +650,7 @@ enum FormSubmissionStatus {
 /// second FormSubmission.
 model FormSubmission {
   id                    String               @id @default(uuid()) @db.Uuid
+  trackingCode          String?              @unique @map("tracking_code")
   formVersionId         String               @map("form_version_id") @db.Uuid
   channelId             String               @map("channel_id") @db.Uuid
   submitterId           String               @map("submitter_id") @db.Uuid
@@ -669,6 +670,7 @@ model FormSubmission {
   evaluationCase EvaluationCase?
 
   @@index([channelId])
+  @@index([trackingCode])
   @@map("form_submissions")
 }
 

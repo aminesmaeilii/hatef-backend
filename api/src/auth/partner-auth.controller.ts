@@ -50,9 +50,11 @@ export class PartnerAuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<AuthSessionResponse> {
-    const submission = await this.prisma.formSubmission.findUnique({
-      where: { id: body.trackingCode.trim() },
-    });
+    const trackingCode = body.trackingCode.trim();
+    const submission =
+      trackingCode.length === 6
+        ? await this.prisma.formSubmission.findUnique({ where: { trackingCode } })
+        : await this.prisma.formSubmission.findUnique({ where: { id: trackingCode } });
     if (!submission || submission.status !== "SUBMITTED") {
       await this.auditLog.record({
         actorType: "system",

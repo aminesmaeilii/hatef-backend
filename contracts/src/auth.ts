@@ -50,7 +50,7 @@ export const internalLoginResponseSchema = z.discriminatedUnion("status", [
 export type InternalLoginResponse = z.infer<typeof internalLoginResponseSchema>;
 
 export const partnerTrackingLoginSchema = z.object({
-  trackingCode: z.string().min(1).max(128),
+  trackingCode: z.string().regex(/^\d{6}$/, "کد پیگیری باید ۶ رقم باشد."),
 });
 export type PartnerTrackingLogin = z.infer<typeof partnerTrackingLoginSchema>;
 

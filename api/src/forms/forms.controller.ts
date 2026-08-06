@@ -39,6 +39,11 @@ export class FormsController {
     return this.forms.getForm(formId);
   }
 
+  @Get(":formId/submissions")
+  async listSubmissions(@Param("formId") formId: string) {
+    return this.forms.listSubmissions(formId);
+  }
+
   @Post(":formId/pages")
   async addPage(@Param("formId") formId: string, @Body(new ZodValidationPipe(createFormPageSchema)) body: { title: string; description?: string }) {
     return this.forms.addPage(formId, body);

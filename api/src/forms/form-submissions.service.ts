@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { randomInt } from "node:crypto";
 import { evaluateFieldVisibility, normalizeEitaaId, type FormRuleDefinition } from "@hatef/domain";
 import type { FormSubmission, FormSubmissionRevision, OnboardingStartResponse } from "@hatef/contracts";
 import { PrismaService } from "../prisma/prisma.service";
@@ -184,6 +185,8 @@ export class FormSubmissionsService {
 
     const nextRevisionNumber = submission.currentRevisionNumber + 1;
 
+    const trackingCode = submission.trackingCode ?? (await this.generateTrackingCode());
+
     await this.prisma.$transaction([
       this.prisma.formSubmissionRevision.create({
         data: {
@@ -195,7 +198,7 @@ export class FormSubmissionsService {
       }),
       this.prisma.formSubmission.update({
         where: { id: submissionId },
-        data: { status: "SUBMITTED", currentRevisionNumber: nextRevisionNumber, submittedAt: new Date() },
+        data: { status: "SUBMITTED", currentRevisionNumber: nextRevisionNumber, submittedAt: new Date(), trackingCode },
       }),
       ...consentDocs.map((doc) =>
         this.prisma.consentAcceptance.create({
@@ -228,7 +231,16 @@ export class FormSubmissionsService {
       ipAddress: ip,
     });
 
-    return { trackingCode: submissionId };
+    return { trackingCode };
+  }
+
+  private async generateTrackingCode(): Promise<string> {
+    for (let attempt = 0; attempt < 20; attempt += 1) {
+      const code = randomInt(0, 1_000_000).toString().padStart(6, "0");
+      const existing = await this.prisma.formSubmission.findUnique({ where: { trackingCode: code } });
+      if (!existing) return code;
+    }
+    throw new BadRequestException("ایجاد کد پیگیری ناموفق بود. لطفا دوباره تلاش کنید.");
   }
 
   /** Narrow, named special case — the one form field with a real 1:1 mapping onto Channel.eitaaId. Not a generic form↔entity sync mechanism. */

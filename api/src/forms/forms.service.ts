@@ -146,6 +146,37 @@ export class FormsService {
     };
   }
 
+  async listSubmissions(formId: string): Promise<
+    {
+      id: string;
+      trackingCode: string | null;
+      channelTitle: string;
+      status: string;
+      submittedAt: string | null;
+      answers: Record<string, unknown>;
+    }[]
+  > {
+    const submissions = await this.prisma.formSubmission.findMany({
+      where: { formVersion: { formId } },
+      orderBy: { submittedAt: "desc" },
+      include: {
+        channel: { select: { title: true } },
+        answers: { include: { formField: { select: { label: true, key: true } } } },
+      },
+    });
+
+    return submissions.map((submission) => ({
+      id: submission.id,
+      trackingCode: submission.trackingCode,
+      channelTitle: submission.channel.title,
+      status: submission.status,
+      submittedAt: submission.submittedAt?.toISOString() ?? null,
+      answers: Object.fromEntries(
+        submission.answers.map((answer) => [answer.formField.label || answer.formField.key, answer.value]),
+      ),
+    }));
+  }
+
   async getPublishedDefinition(formKey: string): Promise<FormVersionDefinition> {
     const form = await this.prisma.form.findUnique({
       where: { key: formKey },
