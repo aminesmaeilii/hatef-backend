@@ -30,6 +30,7 @@ describe("Phase 2: form engine immutability + evaluation workflow (integration, 
   let submissionId: string;
   let requiredFieldId: string;
   let secondFieldId: string;
+  let documentFieldId: string;
   let requiredFieldKey: string;
   let secondFieldKey: string;
 
@@ -154,8 +155,14 @@ describe("Phase 2: form engine immutability + evaluation workflow (integration, 
       .set("X-CSRF-Token", adminCsrf)
       .send({ key: "optional_field", label: "Optional field", type: "TEXT", required: false })
       .expect(201);
+    const fieldC = await adminAgent
+      .post(`/api/v1/forms/sections/${section.body.id}/fields`)
+      .set("X-CSRF-Token", adminCsrf)
+      .send({ key: "resume_file", label: "Resume file", type: "DOCUMENT", required: false })
+      .expect(201);
     requiredFieldId = fieldA.body.id;
     secondFieldId = fieldB.body.id;
+    documentFieldId = fieldC.body.id;
     requiredFieldKey = fieldA.body.key;
     secondFieldKey = fieldB.body.key;
 
@@ -198,6 +205,24 @@ describe("Phase 2: form engine immutability + evaluation workflow (integration, 
       .set("X-CSRF-Token", partnerCsrf)
       .send({ answers: { [requiredFieldId]: "first answer" } })
       .expect(200);
+
+    const pdfBytes = Buffer.from("%PDF-1.7\n% test resume\n");
+    const uploadRes = await partnerAgent
+      .post(`/api/v1/channels/${channelId}/files`)
+      .set("X-CSRF-Token", partnerCsrf)
+      .attach("file", pdfBytes, { filename: "resume.pdf", contentType: "application/pdf" })
+      .expect(201);
+
+    await partnerAgent
+      .patch(`/api/v1/channels/${channelId}/form-submissions/${submissionId}/answers`)
+      .set("X-CSRF-Token", partnerCsrf)
+      .send({ answers: { [documentFieldId]: { fileId: uploadRes.body.id } } })
+      .expect(200);
+
+    const fileAnswer = await prisma.formAnswer.findUniqueOrThrow({
+      where: { formSubmissionId_formFieldId: { formSubmissionId: submissionId, formFieldId: documentFieldId } },
+    });
+    expect(fileAnswer.value).toEqual({ fileId: uploadRes.body.id });
 
     await partnerAgent
       .post(`/api/v1/channels/${channelId}/form-submissions/${submissionId}/submit`)
